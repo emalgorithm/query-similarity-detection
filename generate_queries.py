@@ -1,41 +1,50 @@
 from query import Query
-import numpy as np
-from datetime import datetime
 import random
 
 from constants import Resolution, AlgorithmName, Constants
 
-"""
-Generates two density queries which are similar to each other.
-Two density queries are similar when:
-- resolution = resolution’
-- keySelector = keySelector’
-- |startDate - startDate’| < 60 minutes
-- |endDate - endDate’| < 60 minutes
-"""
+
 def generate_similar_density_queries():
+    """
+    Generates two density queries which are similar to each other.
+    Two density queries are similar when:
+    - resolution = resolution’
+    - keySelector = keySelector’
+    - |startDate - startDate’| < 60 minutes
+    - |endDate - endDate’| < 60 minutes
+    """
     algorithm_name = AlgorithmName.DENSITY
     start_date = generate_random_timestamp()
     end_date = generate_random_timestamp(min_timestamp=start_date)
     params = {}
-    resolution = Resolution.LOCATION_LEVEL_1
-    key_selector = random.choice(Constants.LEVEL_1_LOCATIONS)
+    resolution = random.choice(Constants.LOCATION_LEVELS)
+    key_selector = generate_random_location(resolution)
     sample = random.uniform(0, 1)
     q1 = Query(algorithm_name=algorithm_name, start_date=start_date, end_date=end_date,
                params=params, resolution=resolution, key_selector=key_selector, sample=sample)
 
+    similar_start_date = generate_similar_timestamp(start_date)
+    similar_end_date = generate_similar_timestamp(end_date)
+    different_sample = random.uniform(0, 1)
+    q2 = Query(algorithm_name=algorithm_name, start_date=similar_start_date,
+               end_date=similar_end_date, params=params, resolution=resolution,
+               key_selector=key_selector, sample=different_sample)
 
-"""
-Generate a random int timestamp between the provided timestamps
-"""
+    return q1, q2
+
+
 def generate_random_timestamp(min_timestamp=Constants.MIN_TIMESTAMP, max_timestamp=Constants.MAX_TIMESTAMP):
+    """
+    Generate a random int timestamp between the provided timestamps
+    """
     return random.randint(min_timestamp, max_timestamp)
 
-"""
-Generate a random int timestamp similar to the given timestamp and between the provided timestamps
-"""
+
 def generate_similar_timestamp(timestamp, min_timestamp=Constants.MIN_TIMESTAMP,
                                max_timestamp=Constants.MAX_TIMESTAMP):
+    """
+    Generate a random int timestamp similar to the given timestamp and between the provided timestamps
+    """
     # 60 minutes in second
     similarity_threshold = 60 * 60
 
@@ -44,6 +53,16 @@ def generate_similar_timestamp(timestamp, min_timestamp=Constants.MIN_TIMESTAMP,
 
     return generate_random_timestamp(min_timestamp, max_timestamp)
 
+
+def generate_random_location(resolution):
+    """
+        Generate a random location for the given resolution
+    """
+    if resolution == Resolution.LOCATION_LEVEL_1:
+        return random.choice(Constants.LEVEL_1_LOCATIONS)
+    elif resolution == Resolution.LOCATION_LEVEL_2:
+        return random.choice(Constants.LEVEL_2_LOCATIONS)
+    return random.choice(Constants.LEVEL_3_LOCATIONS)
 
 # def generate_random_query():
 #     startDate = generate_random_datetime()
