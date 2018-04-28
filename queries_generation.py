@@ -40,10 +40,10 @@ def generate_not_similar_density_query(q1):
 
 
 def generate_not_similar_mobility_query(q1):
-    q2 = generate_random_density_query()
+    q2 = generate_random_mobility_query()
 
     while are_mobility_queries_similar(q1, q2):
-        q2 = generate_random_density_query()
+        q2 = generate_random_mobility_query()
 
     return q2
 
