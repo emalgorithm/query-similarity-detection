@@ -1,3 +1,5 @@
+from datetime import datetime
+
 class Query(object):
     """
     algorithm_name: string
@@ -17,6 +19,19 @@ class Query(object):
         self.resolution = resolution
         self.key_selector = key_selector
         self.sample = sample
+
+    def __repr__(self):
+        start_date_nice = datetime.fromtimestamp(self.start_date).strftime('%Y-%m-%d %H:%M:%S')
+        end_date_nice = datetime.fromtimestamp(self.end_date).strftime('%Y-%m-%d %H:%M:%S')
+
+        return "Query(algorithm_name = {}, start_date = '{}', end_date = '{}', params = {}, " \
+               "resolution = {}, key_selector = '{}', sample = {})".format(self.algorithm_name,
+                                                                           start_date_nice,
+                                                                           end_date_nice,
+                                                                           self.params,
+                                                                           self.resolution,
+                                                                           self.key_selector,
+                                                                           self.sample)
 
     def encode(self):
         algorithm_encoding = self.encode_algorithm(self.algorithm_name)
