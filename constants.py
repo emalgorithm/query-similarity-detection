@@ -3,14 +3,14 @@ from datetime import datetime
 
 
 class Resolution(Enum):
-    LOCATION_LEVEL_1 = "location_level_1"
-    LOCATION_LEVEL_2 = "location_level_2"
-    LOCATION_LEVEL_3 = "location_level_3"
+    LOCATION_LEVEL_1 = 0
+    LOCATION_LEVEL_2 = 1
+    LOCATION_LEVEL_3 = 2
 
 
 class AlgorithmName(Enum):
-    DENSITY = "density"
-    MOBILITY = "mobility"
+    DENSITY = 0
+    MOBILITY = 1
 
 
 class Constants(object):
