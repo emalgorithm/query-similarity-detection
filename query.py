@@ -1,5 +1,8 @@
 from datetime import datetime
 
+from constants import Constants
+
+
 class Query(object):
     """
     algorithm_name: string
@@ -35,11 +38,12 @@ class Query(object):
 
     def encode(self):
         algorithm_encoding = self.encode_algorithm(self.algorithm_name)
-        start_date_encoding = self.start_date.timestamp()
-        end_date_encoding = self.end_date.timestamp()
+        start_date_encoding = self.start_date
+        end_date_encoding = self.end_date
         first_window_encoding, second_window_encoding = self.encode_params(self.params)
         resolution_encoding = self.encode_resolution(self.resolution)
         key_selector_encoding = self.encode_key_selector(self.key_selector)
+        sample_encoding = self.sample
 
         return [
             algorithm_encoding,
@@ -48,26 +52,31 @@ class Query(object):
             first_window_encoding,
             second_window_encoding,
             resolution_encoding,
-            key_selector_encoding
+            key_selector_encoding,
+            sample_encoding
         ]
 
     # TODO: Move encoding functions to another file
     def encode_algorithm(self, algorithm):
-        algorithms = ['density', 'mobility']
-        return algorithms.index(algorithm)
+        return algorithm.value
 
     def encode_resolution(self, resolution):
-        resolutions = ['location_level_1', 'location_level_2', 'location_level_3']
-        return resolutions.index(resolution)
+        return resolution.value
 
     def encode_key_selector(self, key_selector):
-        # TODO: Hash?
-        key_selectors = ['Dakar', 'London', 'Rome']
-        return key_selectors.index(key_selector)
+        if key_selector in Constants.LEVEL_1_LOCATIONS:
+            return Constants.LEVEL_1_LOCATIONS.index(key_selector)
+        elif key_selector in Constants.LEVEL_2_LOCATIONS:
+            return Constants.LEVEL_2_LOCATIONS.index(key_selector)
+        return Constants.LEVEL_3_LOCATIONS.index(key_selector)
 
     def encode_params(self, params):
-        return params.first_window.timestamp(), params.second_window.timestamp()
+        first_window = 0
+        if "first_window" in params:
+            first_window = params.first_window
 
+        second_window = 0
+        if "second_window" in params:
+            second_window = params.second_window
 
-        
-    
+        return first_window, second_window
