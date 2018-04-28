@@ -1,4 +1,13 @@
 class Query(object):
+    """
+    algorithm_name: string
+    start_date: int (timestamp)
+    end_date: int (timestamp)
+    params: dict
+    resolution: string
+    key_selector: string
+    sample: float
+    """
     def __init__(self, algorithm_name, start_date, end_date, params, resolution, key_selector,
                  sample):
         self.algorithm_name = algorithm_name
