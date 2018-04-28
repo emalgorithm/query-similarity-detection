@@ -64,6 +64,9 @@ class Query(object):
         return resolution.value
 
     def encode_key_selector(self, key_selector):
+        if "." in key_selector:
+            loc1, loc2 = key_selector.split('.')
+            return 2 ** self.encode_key_selector(loc1) + 2 ** self.encode_key_selector(loc2)
         if key_selector in Constants.LEVEL_1_LOCATIONS:
             return Constants.LEVEL_1_LOCATIONS.index(key_selector)
         elif key_selector in Constants.LEVEL_2_LOCATIONS:
@@ -73,10 +76,10 @@ class Query(object):
     def encode_params(self, params):
         first_window = 0
         if "first_window" in params:
-            first_window = params.first_window
+            first_window = params["first_window"]
 
         second_window = 0
         if "second_window" in params:
-            second_window = params.second_window
+            second_window = params["first_window"]
 
         return first_window, second_window
