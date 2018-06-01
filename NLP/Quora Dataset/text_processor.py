@@ -1,16 +1,20 @@
-from nltk.tokenize import TweetTokenizer
+from nltk.tokenize.treebank import TreebankWordTokenizer, TreebankWordDetokenizer
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
 from collections import Counter
 
 class TextProcessor():
     def __init__(self):
-        self.tknzr = TweetTokenizer()
+        self.tknzr = TreebankWordTokenizer()
+        self.detknzr = TreebankWordDetokenizer()
         self.stops = set(stopwords.words("english"))
         self.stemmer = PorterStemmer()
     
     def tokenize(self, text):
         return self.tknzr.tokenize(text)
+    
+    def detokenize(self, text):
+        return self.detknzr.detokenize(text)
     
     def remove_stopwords(self, text):
         return [word for word in text if word not in self.stops]
