@@ -6,9 +6,9 @@ class WordsInCommonFeatureExtractor():
         self.tp = TextProcessor()
         
     def get_features(self, X):
-        Xnum = np.apply_along_axis(lambda x: self.get_features_for_sample(str(x[0]), str(x[1])), 1, X)
+         return np.apply_along_axis(lambda x: self.get_features_single(str(x[0]), str(x[1])), 1, X)
         
-    def get_features_for_sample(self, q1, q2):
+    def get_features_single(self, q1, q2):
         """
         There is only a single feature which is is the ratio of words that appear in both questions over words which 
         appear in either.
