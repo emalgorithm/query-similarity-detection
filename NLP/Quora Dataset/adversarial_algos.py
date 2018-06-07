@@ -1,4 +1,4 @@
-def adversarial_white_box_change(q1, q2, model, tp, w2v, threshold=0.4):
+def adversarial_white_box_change(q1, q2, model, tp, word_similarity, threshold=0.4):
     """
     'q1' and 'q2' are the two questions which are detected as similar by the classifier: score >= 0.4.
     'model' is the classifier used by the oracle, which in this case returns a similarity score
@@ -19,8 +19,8 @@ def adversarial_white_box_change(q1, q2, model, tp, w2v, threshold=0.4):
         new_q2 = q2_tokenized
         
         for i, word in enumerate(q2_tokenized):
-            if word in w2v.model.vocab:
-                closest_word = w2v.get_closest_word(word)
+            if word_similarity.contains_word(word):
+                closest_word = word_similarity.most_similar(word)
                 q2_modified = list(q2_tokenized)
                 q2_modified[i] = closest_word
                 score = model.predict_single(tp.detokenize(q1_tokenized), tp.detokenize(q2_modified))
