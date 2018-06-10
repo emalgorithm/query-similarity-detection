@@ -58,4 +58,4 @@ def adversarial_white_box_change(q1, q2, model, tp, word_similarity, threshold=0
         result = "SUCCESSFUL" if successful else "UNSUCCESSFUL"
         print(result)
 
-    return successful
+    return successful, q1, tp.detokenize(new_q2)
