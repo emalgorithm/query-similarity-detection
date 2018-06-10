@@ -46,7 +46,7 @@ class SubstituteModel:
         return self.model.predict([q1_data, q2_data])
 
     def predict_single(self, q1, q2):
-        return self.predict(np.array([[q1, q2]]))
+        return self.predict(np.array([[q1, q2]]))[0][0]
 
     def train(self, X_train, y_train):
         """Train the substitute model using the current training data"""
@@ -59,7 +59,7 @@ class SubstituteModel:
         q1_data = pad_sequences(question1_word_sequences, maxlen=MAX_SEQUENCE_LENGTH)
         q2_data = pad_sequences(question2_word_sequences, maxlen=MAX_SEQUENCE_LENGTH)
 
-        history = self.substitute_model.fit([q1_data, q2_data],
+        history = self.model.fit([q1_data, q2_data],
                                             y_train,
                                             epochs=NB_EPOCHS,
                                             validation_split=VALIDATION_SPLIT,
