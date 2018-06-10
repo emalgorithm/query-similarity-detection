@@ -1,4 +1,5 @@
-def adversarial_white_box_change(q1, q2, model, tp, word_similarity, threshold=0.5):
+def adversarial_white_box_change(q1, q2, model, tp, word_similarity, threshold=0.5,
+                                 max_replaced_words=5, verbose=0):
     """
     'q1' and 'q2' are the two questions which are detected as similar by the classifier: score >= 0.5.
     'model' is the classifier used by the oracle, which in this case returns a similarity score
@@ -10,11 +11,13 @@ def adversarial_white_box_change(q1, q2, model, tp, word_similarity, threshold=0
     successful = False
     replaced_words = []
     replacing_words = []
-    print("initial q1: {}".format(q1))
-    print("initial q2: {}".format(q2))
-    print("Initial similarity is {}".format(model.predict_single(tp.detokenize(q1_tokenized), tp.detokenize(q2_tokenized))))
+
+    if verbose == 1:
+        print("initial q1: {}".format(q1))
+        print("initial q2: {}".format(q2))
+        print("Initial similarity is {}".format(model.predict_single(tp.detokenize(q1_tokenized), tp.detokenize(q2_tokenized))))
     
-    while not successful or len(replaced_words) >= 5:
+    while not successful or len(replaced_words) >= max_replaced_words:
         # Try changing each word in q2. At the end, select the change that gives the best improvement
         min_score = model.predict_single(tp.detokenize(q1_tokenized), tp.detokenize(q2_tokenized))
         new_q2 = q2_tokenized
@@ -41,14 +44,18 @@ def adversarial_white_box_change(q1, q2, model, tp, word_similarity, threshold=0
             replaced_words.append(candidate_replaced_word)
             replacing_words.append(candidate_replacing_word)
             
-        
-        print()
-        print("q1: '{}'".format(tp.detokenize(q1_tokenized)))
-        print("q2: '{}'".format(tp.detokenize(new_q2)))
-        print("Similarity: {}. Replaced words {} with {}".format(min_score, replaced_words, replacing_words))
+        if verbose == 1:
+            print()
+            print("q1: '{}'".format(tp.detokenize(q1_tokenized)))
+            print("q2: '{}'".format(tp.detokenize(new_q2)))
+            print("Similarity: {}. Replaced words {} with {}".format(min_score, replaced_words, replacing_words))
         
         if min_score < threshold:
             successful = True
+            break
             
-    if not successful:
-        print("UNSUCCESSFULL")
+    if verbose == 1:
+        result = "SUCCESSFUL" if successful else "UNSUCCESSFUL"
+        print(result)
+
+    return successful
