@@ -3,6 +3,7 @@ import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
 from sklearn.model_selection import train_test_split
 
 def get_balanced_data():
+    np.random.seed(42)
     df_train = pd.read_csv('data/train.csv').dropna()
     
     target = 'is_duplicate'
