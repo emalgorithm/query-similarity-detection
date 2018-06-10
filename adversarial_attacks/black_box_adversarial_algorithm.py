@@ -1,11 +1,10 @@
-import json
 import numpy as np
-import pickle
 
 from text_processor import TextProcessor
 from util import get_balanced_data
 from glove_synonyms import GloveSynonyms
 from substitute_model import SubstituteModel
+from adversarial_algos import adversarial_white_box_change
 
 class BlackBoxAdversarialAlgorithm:
     def __init__(self, oracle):
@@ -17,21 +16,33 @@ class BlackBoxAdversarialAlgorithm:
         # Start with 100 training examples
         X_train, _, _, _ = get_balanced_data()
         self.X_train = X_train[:100]
+        self.n_st_epochs = 1
 
     def substitute_training(self):
-        for i in range(5):
+        for i in range(self.n_st_epochs):
             # Label
             y_train = self.label(self.X_train)
             # Train
             self.substitute_model.train(self.X_train, y_train)
             # Augment
-            self.X_train = self.augment(self.X_train)
+            if i < self.n_st_epochs - 1:
+                self.X_train = self.augment(self.X_train)
+
+    def attack(self, q1, q2):
+        # Craft adversarial example using white-box algorithm on substitute model
+        success, adv_q1, adv_q2 = self.craft_adversarial_example(q1, q2)
+
+        if success:
+            # Use previously crafted adversarial example to try to fool the oracle
+            return self.oracle.predict_single(adv_q1, adv_q2) < 0.5
+        else:
+            return None
 
     def craft_adversarial_example(self, q1, q2):
         """Modify q1 and q2 so that they fool the substitute model. Hopefully, they will be able
         to fool the oracle as well"""
-        pass
-
+        return adversarial_white_box_change(q1, q2, self.substitute_model, self.tp,
+                                            self. word_similarity)
 
     def label(self, X_train):
         """Label the current training examples by querying the oracle"""
