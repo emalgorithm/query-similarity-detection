@@ -14,9 +14,27 @@ class BlackBoxAdversarialAlgorithm:
         self.word_similarity = GloveSynonyms()
 
         # Start with 100 training examples
-        X_train, _, _, _ = get_balanced_data()
+        X_train, X_test, _, _ = get_balanced_data()
         self.X_train = X_train[:100]
-        self.n_st_epochs = 1
+        self.X_test = X_test[:-100]
+        self.n_st_epochs = 10
+
+    def evaluate(self, X_test):
+        results = []
+        for i in range(100):
+            q1 = X_test[i, 0]
+            q2 = X_test[i, 1]
+            if self.oracle.predict_single(q1, q2) > 0.5:
+                results.append(self.attack(q1, q2))
+
+            if i % 10 == 0:
+                print("Evaluation: {}% done".format(i))
+
+        results = [result for result in results if result is not None]
+        transferability = sum(results) / len(results)
+
+        print("Current transferability of black box attack model is {}".format(transferability))
+        return transferability
 
     def substitute_training(self):
         for i in range(self.n_st_epochs):
@@ -24,6 +42,8 @@ class BlackBoxAdversarialAlgorithm:
             y_train = self.label(self.X_train)
             # Train
             self.substitute_model.train(self.X_train, y_train)
+            # Evaluate
+            self.evaluate(self.X_test)
             # Augment
             if i < self.n_st_epochs - 1:
                 self.X_train = self.augment(self.X_train)
@@ -74,6 +94,6 @@ class BlackBoxAdversarialAlgorithm:
                     min_dist_from_bound = dist_from_bound
                     new_q2 = q2_modified
 
-        print("Augmentation: replaced {} with {}".format(row[1], self.tp.detokenize(new_q2)))
+        # print("Augmentation: replaced {} with {}".format(row[1], self.tp.detokenize(new_q2)))
         row[1] = self.tp.detokenize(new_q2)
         return row
