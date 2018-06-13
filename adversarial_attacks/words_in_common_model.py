@@ -10,4 +10,4 @@ class WordsInCommonModel():
         return self.model.predict(X_test)
 
     def predict_single(self, q1, q2):
-        return self.model.predict_single(q1, q2)
+        return self.model.predict_single(q1, q2)[0]
