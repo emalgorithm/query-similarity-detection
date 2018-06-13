@@ -1,13 +1,16 @@
 import numpy as np
+from nltk.corpus import stopwords
 
 from text_processor import TextProcessor
 from util import get_balanced_data
 from glove_synonyms import GloveSynonyms
 from substitute_model import SubstituteModel
 from adversarial_algos import adversarial_white_box_change
+from kaggle_model import KaggleModel
+
 
 class BlackBoxAdversarialAlgorithm:
-    def __init__(self, oracle):
+    def __init__(self, oracle, n_initial_train=1000, n_test=1000, n_st_epochs=10):
         self.oracle = oracle
         self.substitute_model = SubstituteModel()
         self.tp = TextProcessor()
@@ -15,25 +18,28 @@ class BlackBoxAdversarialAlgorithm:
 
         # Start with 100 training examples
         X_train, X_test, _, _ = get_balanced_data()
-        self.X_train = X_train[:100]
-        self.X_test = X_test[:-100]
-        self.n_st_epochs = 10
+        self.X_train = X_train[:n_initial_train]
+        self.X_test = X_test
+        self.n_st_epochs = n_st_epochs
+        self.n_test = n_test
+        self.similarity_threshold = 0.5
 
     def evaluate(self, X_test):
         results = []
-        for i in range(100):
-            q1 = X_test[i, 0]
-            q2 = X_test[i, 1]
-            if self.oracle.predict_single(q1, q2) > 0.5:
+        for i in range(self.n_test):
+            q1 = X_test[-i, 0]
+            q2 = X_test[-i, 1]
+            if self.oracle.predict_single(q1, q2) > self.similarity_threshold:
                 results.append(self.attack(q1, q2))
 
             if i % 10 == 0:
-                print("Evaluation: {}% done".format(i))
+                print("Evaluation: {} out of {} done".format(i, self.n_test))
 
         results = [result for result in results if result is not None]
         transferability = sum(results) / len(results)
 
-        print("Current transferability of black box attack model is {}".format(transferability))
+        print("Current transferability of black box attack model is {0:.2f}%".format(
+            transferability * 100))
         return transferability
 
     def substitute_training(self):
@@ -76,6 +82,7 @@ class BlackBoxAdversarialAlgorithm:
         return np.concatenate((X_train, X_train_aug), 0)
 
     def replace_word_with_greatest_change(self, row):
+        stop = set(stopwords.words('english'))
         q1_tokenized = self.tp.tokenize(row[0])
         q2_tokenized = self.tp.tokenize(row[1])
         min_dist_from_bound = 1.0
@@ -83,7 +90,7 @@ class BlackBoxAdversarialAlgorithm:
         new_q2 = q2_tokenized
 
         for i, word in enumerate(q2_tokenized):
-            if self.word_similarity.contains_word(word):
+            if self.word_similarity.contains_word(word) and word not in stop:
                 closest_word = self.word_similarity.most_similar(word)
                 q2_modified = list(q2_tokenized)
                 q2_modified[i] = closest_word
