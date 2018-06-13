@@ -5,6 +5,7 @@ import pickle
 import numpy as np
 import json
 
+
 class KaggleModel():
     def __init__(self):
         path_prefix = 'models/quora-top-performer/'
@@ -35,5 +36,4 @@ class KaggleModel():
         return self.model.predict([q1_data, q2_data])
             
     def predict_single(self, q1, q2):
-        return self.predict(np.array([[q1, q2]]))
-        
+        return self.predict(np.array([[q1, q2]]))[0, 0]
