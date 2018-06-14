@@ -11,12 +11,13 @@ from adversarial_algos import adversarial_white_box_change
 
 
 class BlackBoxAdversarialAlgorithm:
-    def __init__(self, oracle, n_initial_train=1000, n_test=1000, n_st_epochs=5,
+    def __init__(self, oracle, word_similarity=GloveSynonyms(), n_initial_train=1000,
+                 n_test=1000, n_st_epochs=5,
                  similarity_threshold=0.5):
         self.oracle = oracle
         self.substitute_model = SubstituteModel()
         self.tp = TextProcessor()
-        self.word_similarity = GloveSynonyms()
+        self.word_similarity = word_similarity
         self.similarity_threshold = similarity_threshold
         self.n_st_epochs = n_st_epochs
         self.n_test = n_test
@@ -28,13 +29,15 @@ class BlackBoxAdversarialAlgorithm:
         # Keep only testing data points which are already classified as similar by the oracle
         similar_rows = (self.oracle.predict(X_test) > self.similarity_threshold)[:, 0]
         self.X_test = X_test[similar_rows]
-        assert((self.oracle.predict(X_test) > self.similarity_threshold).all())
+        self.X_test = self.X_test[:self.n_test]
+        assert((self.oracle.predict(self.X_test) > self.similarity_threshold).all())
 
     def evaluate(self, X_test):
         results = []
         for i in range(self.n_test):
             q1 = X_test[-i, 0]
             q2 = X_test[-i, 1]
+
             if self.oracle.predict_single(q1, q2) > self.similarity_threshold:
                 results.append(self.attack(q1, q2))
 
@@ -43,7 +46,8 @@ class BlackBoxAdversarialAlgorithm:
 
         results = [result for result in results if result is not None]
         transferability = sum(results) / len(results) if len(results) > 0 else 0
-        print(results)
+
+        print("{} attacks were successful out of {} tried".format(sum(results), len(results)))
         print("Current transferability of black box attack model is {0:.2f}%".format(
             transferability * 100))
         return transferability
