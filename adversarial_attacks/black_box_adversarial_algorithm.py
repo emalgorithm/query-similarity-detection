@@ -29,6 +29,7 @@ class BlackBoxAdversarialAlgorithm:
         self.similarity_threshold = similarity_threshold
         self.n_st_epochs = n_st_epochs
         self.n_test = n_test
+        self.current_st_epoch = 1
 
         # Start with 100 training examples
         X_train, X_test, _, _ = get_balanced_data()
@@ -63,7 +64,8 @@ class BlackBoxAdversarialAlgorithm:
         transferability = sum(results) / len(results) if len(results) > 0 else 0
 
         print("{} attacks were successful out of {} tried".format(sum(results), len(results)))
-        print("Current transferability of black box attack model is {0:.2f}%".format(
+        print("Transferability of black box attack model after epoch {0} is {1:.2f}%".format(
+            self.current_st_epoch,
             transferability * 100))
         return transferability
 
@@ -78,6 +80,7 @@ class BlackBoxAdversarialAlgorithm:
             # Augment
             if i < self.n_st_epochs - 1:
                 self.X_train = self.augment(self.X_train)
+            self.current_st_epoch += 1
 
     def attack(self, q1, q2):
         # Craft adversarial example using white-box algorithm on substitute model
