@@ -11,12 +11,20 @@ from adversarial_algos import adversarial_white_box_change
 
 
 class BlackBoxAdversarialAlgorithm:
+    """
+    Class which represents an API for performing a black box adversarial attack against a given oracle.
+    """
     def __init__(self, oracle, word_similarity=GloveSynonyms(), n_initial_train=1000,
                  n_test=1000, n_st_epochs=5,
                  similarity_threshold=0.5):
+        # Oracle we are trying to attack. It takes a pair of questions as input and returns
+        # whether they are similar (1) or not similar (0)
         self.oracle = oracle
+        # Substitute model we use to emulate the oracle.
         self.substitute_model = SubstituteModel()
+        # A util to perform text related operations
         self.tp = TextProcessor()
+        # A utility which contains a vector embedding for words
         self.word_similarity = word_similarity
         self.similarity_threshold = similarity_threshold
         self.n_st_epochs = n_st_epochs
@@ -33,6 +41,13 @@ class BlackBoxAdversarialAlgorithm:
         assert((self.oracle.predict(self.X_test) > self.similarity_threshold).all())
 
     def evaluate(self, X_test):
+        """
+        :param X_test: A numpy array containing the data points we want to use to evaluate our
+        black box method
+        :return: The transferability score of the black box method. The transferability score is
+        calculated as the fraction of adversarial examples which work both on the substitute
+        model and the oracle, over the adversarial examples which work on the substitute model
+        """
         results = []
         for i in range(self.n_test):
             q1 = X_test[-i, 0]
