@@ -1,28 +1,34 @@
 import numpy as np
 from nltk.corpus import stopwords
+import time
+
 
 from text_processor import TextProcessor
-from util import get_balanced_data
+from util import get_balanced_data, parallel_apply_along_axis
 from glove_synonyms import GloveSynonyms
 from substitute_model import SubstituteModel
 from adversarial_algos import adversarial_white_box_change
-from kaggle_model import KaggleModel
 
 
 class BlackBoxAdversarialAlgorithm:
-    def __init__(self, oracle, n_initial_train=1000, n_test=1000, n_st_epochs=10):
+    def __init__(self, oracle, n_initial_train=1000, n_test=1000, n_st_epochs=5,
+                 similarity_threshold=0.5):
         self.oracle = oracle
         self.substitute_model = SubstituteModel()
         self.tp = TextProcessor()
         self.word_similarity = GloveSynonyms()
+        self.similarity_threshold = similarity_threshold
+        self.n_st_epochs = n_st_epochs
+        self.n_test = n_test
 
         # Start with 100 training examples
         X_train, X_test, _, _ = get_balanced_data()
         self.X_train = X_train[:n_initial_train]
-        self.X_test = X_test
-        self.n_st_epochs = n_st_epochs
-        self.n_test = n_test
-        self.similarity_threshold = 0.5
+
+        # Keep only testing data points which are already classified as similar by the oracle
+        similar_rows = (self.oracle.predict(X_test) > self.similarity_threshold)[:, 0]
+        self.X_test = X_test[similar_rows]
+        assert((self.oracle.predict(X_test) > self.similarity_threshold).all())
 
     def evaluate(self, X_test):
         results = []
@@ -36,8 +42,8 @@ class BlackBoxAdversarialAlgorithm:
                 print("Evaluation: {} out of {} done".format(i, self.n_test))
 
         results = [result for result in results if result is not None]
-        transferability = sum(results) / len(results)
-
+        transferability = sum(results) / len(results) if len(results) > 0 else 0
+        print(results)
         print("Current transferability of black box attack model is {0:.2f}%".format(
             transferability * 100))
         return transferability
@@ -77,7 +83,11 @@ class BlackBoxAdversarialAlgorithm:
     def augment(self, X_train):
         """Augment current training data with examples which are closer to boundary (score of
         0.5)"""
+        print("Augmenting training data")
+        start_time = time.time()
         X_train_aug = np.apply_along_axis(self.replace_word_with_greatest_change, 1, X_train)
+        end_time = time.time()
+        print("Augmenting done. It took {0:.4} seconds".format(end_time - start_time))
 
         return np.concatenate((X_train, X_train_aug), 0)
 
