@@ -1,11 +1,12 @@
 import numpy as np
 import time
+from nltk.corpus import stopwords
 
 from text_processor import TextProcessor
 from util import get_balanced_data, parallel_apply_along_axis
 from glove_synonyms import GloveSynonyms
 from substitute_model import SubstituteModel
-from adversarial_algos import adversarial_white_box_change
+from algorithms.white_box_adversarial_algorithm import WhiteBoxAdversarialAlgorithm
 
 
 class BlackBoxAdversarialAlgorithm:
@@ -36,6 +37,11 @@ class BlackBoxAdversarialAlgorithm:
         self.tp = TextProcessor()
         # A utility which contains a vector embedding for words
         self.word_similarity = word_similarity
+
+        # White-box algorithm that we will use on the substitute model
+        self.white_box_algorithm = WhiteBoxAdversarialAlgorithm(self.substitute_model, self.tp,
+                                                                self.word_similarity)
+
         self.similarity_threshold = similarity_threshold
         self.n_st_epochs = n_st_epochs
         self.n_test = n_test
@@ -125,8 +131,7 @@ class BlackBoxAdversarialAlgorithm:
         :param q2: second question of the pair
         :return: crafted adversarial example
         """
-        return adversarial_white_box_change(q1, q2, self.substitute_model, self.tp,
-                                            self. word_similarity)
+        return self.white_box_algorithm.attack(q1, q2)
 
     def label(self, X_train):
         """Label the current training examples by querying the oracle"""
@@ -223,7 +228,6 @@ class BlackBoxAdversarialAlgorithm:
                         min_dist_from_bound = dist_from_bound
                         new_q1 = q1_modified
 
-            # print("Augmentation: replaced {} with {}".format(row[1], self.tp.detokenize(new_q2)))
             row[0] = self.tp.detokenize(new_q1)
         return row
 
