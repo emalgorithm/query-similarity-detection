@@ -1,12 +1,13 @@
-import numpy as np
 import time
-from nltk.corpus import stopwords
 
-from text_processor import TextProcessor
-from util import get_balanced_data, parallel_apply_along_axis
-from glove_synonyms import GloveSynonyms
-from substitute_model import SubstituteModel
+import numpy as np
 from algorithms.white_box_adversarial_algorithm import WhiteBoxAdversarialAlgorithm
+from glove_synonyms import GloveSynonyms
+from models.substitute_model import SubstituteModel
+from nltk.corpus import stopwords
+from text_processor import TextProcessor
+
+from adversarial.util import get_balanced_data
 
 
 class BlackBoxAdversarialAlgorithm:
