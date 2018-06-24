@@ -3,7 +3,7 @@ import pickle
 
 class WordsInCommonModel():
     def __init__(self):
-        path_prefix = 'models/words_in_common/'
+        path_prefix = '../data/words_in_common/'
         self.model = pickle.load(open(path_prefix + 'model.dump', 'rb'))
 
     def predict(self, X_test):
