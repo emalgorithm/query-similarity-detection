@@ -1,15 +1,15 @@
-from keras.preprocessing.sequence import pad_sequences
-from keras.models import Model
-from keras.layers import Input, TimeDistributed, Dense, Lambda, concatenate, Dropout, \
-    BatchNormalization, Conv1D, MaxPooling1D
-from keras.layers.embeddings import Embedding
-from keras.callbacks import Callback, ModelCheckpoint
-from keras import backend as K
 import json
-import numpy as np
 import pickle
 
-from util import load_glove, compute_embedding_matrix
+import numpy as np
+from keras import backend as K
+from keras.layers import Input, Dense, Lambda, concatenate, Dropout, \
+    BatchNormalization
+from keras.layers.embeddings import Embedding
+from keras.models import Model
+from keras.preprocessing.sequence import pad_sequences
+
+from util.util import load_glove, compute_embedding_matrix
 
 WORD_EMBEDDING_MATRIX_FILE = 'models/quora-top-performer/word_embedding_matrix.npy'
 NB_WORDS_DATA_FILE = 'models/quora-top-performer/nb_words.json'
