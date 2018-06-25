@@ -1,8 +1,6 @@
 import time
-
 import numpy as np
 from algorithms.white_box_adversarial_algorithm import WhiteBoxAdversarialAlgorithm
-from word_similarity.glove_synonyms import GloveSynonyms
 from models.substitute_model import SubstituteModel
 from nltk.corpus import stopwords
 from util.text_processor import TextProcessor
@@ -14,7 +12,7 @@ class BlackBoxAdversarialAlgorithm:
     """
     Class which represents an API for our black-box adversarial attack.
     """
-    def __init__(self, oracle, word_similarity=GloveSynonyms(), n_initial_train=1000,
+    def __init__(self, oracle, word_similarity, n_initial_train=1000,
                  n_test=1000, n_st_epochs=5, similarity_threshold=0.5, modify_q1=False,
                  modify_q2=True):
         """
