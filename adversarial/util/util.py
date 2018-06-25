@@ -6,7 +6,7 @@ import multiprocessing
 
 def get_balanced_data():
     np.random.seed(42)
-    df_train = pd.read_csv('data/train.csv').dropna()
+    df_train = pd.read_csv('../data/train.csv').dropna()
     
     target = 'is_duplicate'
     features = ['question1', 'question2']
@@ -81,7 +81,7 @@ def unpacking_apply_along_axis(a):
 
 def load_glove():
     embeddings_index = {}
-    f = open('data/glove.6B.100d.txt')
+    f = open('../data/glove.6B.100d.txt')
     for line in f:
         values = line.split()
         word = values[0]

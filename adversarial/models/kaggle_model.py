@@ -8,7 +8,7 @@ import json
 
 class KaggleModel():
     def __init__(self):
-        path_prefix = './data/quora-top-performer/'
+        path_prefix = '../data/quora-top-performer/'
         self.tokenizer = pickle.load(open(path_prefix + 'tokenizer.dump', 'rb'))
         self.word_embedding_matrix = np.load(open(path_prefix + 'word_embedding_matrix.npy', 'rb'))
         with open(path_prefix + 'nb_words.json', 'r') as f:

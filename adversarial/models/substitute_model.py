@@ -11,9 +11,10 @@ from keras.preprocessing.sequence import pad_sequences
 
 from util.util import load_glove, compute_embedding_matrix
 
-WORD_EMBEDDING_MATRIX_FILE = 'models/quora-top-performer/word_embedding_matrix.npy'
-NB_WORDS_DATA_FILE = 'models/quora-top-performer/nb_words.json'
-TOKENIZER = 'models/quora-top-performer/tokenizer.dump'
+PREFIX = '../data/quora-top-performer/'
+WORD_EMBEDDING_MATRIX_FILE = PREFIX + 'word_embedding_matrix.npy'
+NB_WORDS_DATA_FILE = PREFIX + 'nb_words.json'
+TOKENIZER = PREFIX + 'tokenizer.dump'
 MAX_NB_WORDS = 200000
 MAX_SEQUENCE_LENGTH = 25
 EMBEDDING_DIM = 100
