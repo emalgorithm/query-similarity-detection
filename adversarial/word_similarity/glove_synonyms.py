@@ -1,8 +1,9 @@
-import numpy as np 
+import numpy as np
 
-class GloveSynonyms():
+
+class GloveSynonyms:
     def __init__(self):
-        self.loadGloveModel('data/counter-fitted-vectors.txt')
+        self.loadGloveModel('../data/counter-fitted-vectors.txt')
         
     def get_vector(self, word):
         return self.word_vectors[self.word_to_idx[word]]
