@@ -1,7 +1,7 @@
 import pickle
 
 
-class WordsInCommonModel():
+class WordsInCommonModel:
     def __init__(self):
         path_prefix = '../data/words_in_common/'
         self.model = pickle.load(open(path_prefix + 'model.dump', 'rb'))

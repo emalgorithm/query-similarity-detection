@@ -1,4 +1,4 @@
-from text_processor import TextProcessor
+from util.text_processor import TextProcessor
 import numpy as np
 
 class WordsInCommonFeatureExtractor():
